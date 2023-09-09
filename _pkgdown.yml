@@ -1,0 +1,13 @@
+destination: "../../websites/R/toml/"
+url: "https://trevorldavis.com/R/toml"
+development:
+    mode: auto
+reference:
+  - title: "Encode R objects to TOML"
+    desc: "S3 generic to encode R objects as Tom's Obvious, Minimal Language"
+    contents:
+      - encode_toml
+  - title: "Write TOML config files"
+  - desc: "Encode R objects to TOML and write to a connection"
+    contents:
+      - write_toml

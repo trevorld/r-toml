@@ -1,0 +1,27 @@
+Package: toml
+Type: Package
+Title: Encode 'TOML' configuration file format
+Version: 0.1.0-0
+Authors@R: c(
+        person("Trevor L", "Davis", role=c("aut", "cre"), email="trevor.l.davis@gmail.com",
+               comment = c(ORCID = "0000-0001-6341-4639")))
+Description: Supports encoding a named list into the 'TOML' <https://toml.io/en/#>
+    configuration file format.
+URL: https://trevorldavis.com/R/toml/dev/, https://github.com/trevorld/r-toml
+BugReports: https://github.com/trevorld/r-toml
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
+Depends:
+    R (>= 3.4.0)
+Imports:
+    datetimeoffset,
+    stringi
+Suggests:
+    knitr,
+    rlang,
+    rmarkdown,
+    testthat (>= 3.0.0)
+VignetteBuilder: knitr, rmarkdown
+Config/testthat/edition: 3
