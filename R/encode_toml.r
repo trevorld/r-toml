@@ -10,7 +10,8 @@ encode_toml <- function(x, ...) {
     UseMethod("encode_toml")
 }
 
-#' @param prefix Prefix for keys.  If `NULL` assume this is the top-level aka root table.
+#' @param prefix Prefix for keys.
+#'               If `NULL` and `isFALSE(inline)` assume this is the top-level aka root table.
 #' @param inline Encode as a TOML "inline" table.
 #' @rdname encode_toml
 #' @export
@@ -26,9 +27,10 @@ encode_toml.list <- function(x, ..., prefix = NULL, inline = FALSE) {
         nms <- names(x)
         stopifnot(!any(duplicated(nms)))
         s <- character()
-        for (nm in nms) {
-            v <- x[[nm]]
-            if (!grepl("^[A-Za-z0-9_-]*$", nm)) {
+        for (i in seq_along(x)) {
+            nm <- nms[i]
+            v <- x[[i]]
+            if (!grepl("^[A-Za-z0-9_-]*$", nm) || nchar(nm) == 0L) {
                 nm <- encode_toml.character(nm)
             }
             if (!is.null(prefix))

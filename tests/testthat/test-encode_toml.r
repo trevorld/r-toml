@@ -50,6 +50,10 @@ test_that("Hash tables work", {
 
     expect_equal(encode_toml(named_list()), "")
 
+    l <- list()
+    l[[""]] <- "empty quoted key"
+    expect_equal(encode_toml(l), "'' = 'empty quoted key'")
+
     expect_equal(encode_toml(list(list(a = 1, b = 2))),
                  "[{a = 1.0, b = 2.0}]")
 
