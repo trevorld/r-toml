@@ -48,7 +48,7 @@ encode_toml.list <- function(x, ..., prefix = NULL, inline = FALSE) {
         }
     } else { # Encode an unnamed list as a TOML array
         if (length(x)) {
-            s <- vapply(x, encode_toml, character(1), inline = TRUE) #### lapply() |> unlist()????
+            s <- unlist(lapply(x, encode_toml, character(1), inline = TRUE))
             stopifnot(!any(is.na(s))) #### TOML doesn't support "missing" data
             paste0("[", paste(s, collapse = ", "), "]")
         } else {
@@ -85,7 +85,7 @@ encode_toml.character <- function(x, ...) {
     # Currently no multi-line string support
     # If single-line literal strings work (no `'` or `\n`) will use those
     # else single-line basic string (which escapes special characters)
-    s <- ifelse(grepl("'|\n", x),
+    s <- ifelse(grepl("'|[[:cntrl:]]", x),
                 paste0('"', escape_basic_string(x), '"'),
                 paste0("'", x, "'"))
     maybe_as_array(s)

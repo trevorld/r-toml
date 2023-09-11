@@ -15,7 +15,7 @@
 ## <a name="overview">Overview</a>
 
 **Warning:** this package is a work-in-progress.  
-Currently it only **encodes** [TOML](https://toml.io/) files and only passes 86/99 of the tests in the [toml-test](https://github.com/toml-lang/toml-test) test suite.  Depending on your TOML needs you may consider instead [{RccpTOML}](https://github.com/eddelbuettel/rcpptoml) or [{blogdown}](https://pkgs.rstudio.com/blogdown/reference/read_toml.html).
+Currently it only **encodes** [TOML](https://toml.io/) files and only passes 89/99 of the tests in the [toml-test](https://github.com/toml-lang/toml-test) test suite.  Depending on your TOML needs you may consider instead [{RccpTOML}](https://github.com/eddelbuettel/rcpptoml) or [{blogdown}](https://pkgs.rstudio.com/blogdown/reference/read_toml.html).
 
 `{toml}` provides the following functions to support encoding R objects to [TOML](https://toml.io/).
 
