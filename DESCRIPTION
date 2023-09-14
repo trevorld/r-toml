@@ -16,12 +16,19 @@ RoxygenNote: 7.2.3
 Depends:
     R (>= 3.4.0)
 Imports:
-    datetimeoffset,
+    brio,
+    datetimeoffset (>= 0.4.0-2),
     stringi
 Suggests:
+    bit64,
     knitr,
     rlang,
     rmarkdown,
     testthat (>= 3.0.0)
+Enhances:
+    clock,
+    parttime,
+    nanotime
+Remotes: datetimeoffset=trevorld/r-datetimeoffset
 VignetteBuilder: knitr, rmarkdown
 Config/testthat/edition: 3

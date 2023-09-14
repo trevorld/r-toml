@@ -49,7 +49,7 @@ encode_toml.list <- function(x, ..., prefix = NULL, inline = FALSE) {
     } else { # Encode an unnamed list as a TOML array
         if (length(x)) {
             s <- unlist(lapply(x, encode_toml, character(1), inline = TRUE))
-            stopifnot(!any(is.na(s))) #### TOML doesn't support "missing" data
+            stopifnot("TOML doesn't support missing data" = !any(is.na(s)))
             paste0("[", paste(s, collapse = ", "), "]")
         } else {
             "[]"
@@ -58,7 +58,7 @@ encode_toml.list <- function(x, ..., prefix = NULL, inline = FALSE) {
 }
 
 maybe_as_array <- function(s) {
-    stopifnot(!any(is.na(s))) #### TOML doesn't support "missing" data
+    stopifnot("TOML doesn't support missing data" = !any(is.na(s)))
     if (length(s) != 1L) {
         paste0("[", paste(s, collapse = ", "), "]")
     } else {
@@ -105,15 +105,35 @@ escape_basic_string <- function(x) {
 }
 
 #' @rdname encode_toml
+#' @param big.mark,big.interval `big.mark` is used as a mark between every `big.interval` decimals
+#'                 (before the decimal point).
+#'                 TOML allows this to be either `"_"` or `""`.
 #' @export
-encode_toml.integer <- function(x, ...) {
-    s <- formatC(x, format = "d", big.mark = "_")
+encode_toml.integer <- function(x, ..., big.mark = "_", big.interval = 3L) {
+    stopifnot(big.mark %in% c("", "_"))
+    s <- formatC(x, format = "d", big.mark = big.mark, big.interval = big.interval)
     maybe_as_array(s)
 }
 
+encode_toml.integer64 <- function(x, ..., big.mark = "_", big.interval = 3L) {
+    stopifnot("TOML doesn't support missing data" = !any(is.na(x)))
+    stopifnot(big.mark %in% c("", "_"))
+    if (big.mark == "") {
+        as.character(x)
+    } else {
+        signs <- sign(x)
+        numbers <- vapply(as.character(abs(x)), encode_int_string_helper, character(1),
+                          big.interval = big.interval, USE.NAMES = FALSE)
+        ifelse(signs < 0,
+               paste0("-", numbers),
+               numbers)
+    }
+}
 
-encode_toml.integer64 <- function(x, ...) {
-    formatC(as.numeric(x), format = "f", big.mark = "_", drop0trailing = TRUE)
+encode_int_string_helper <- function(x, big.interval = 3L) {
+    to <- rev(seq(from = nchar(x), to = 1L, by = -big.interval))
+    from <- pmax(1L, to - big.interval + 1L)
+    stringi::stri_paste(stringi::stri_sub(x, from, to), collapse = "_")
 }
 
 #' @rdname encode_toml
@@ -124,12 +144,18 @@ encode_toml.logical <- function(x, ...) {
 }
 
 #' @rdname encode_toml
+#' @param small.mark,small.interval `small.mark` is used as a mark between every `small.interval` decimals
+#'                 after the decimal point.
+#'                 TOML allows this to be either `"_"` or `""`.
 #' @export
-encode_toml.numeric <- function(x, ...) {
-    #### Float formatting currently a bit of a mess
+encode_toml.numeric <- function(x, ...,
+                                big.mark = "_", big.interval = 3L,
+                                small.mark = big.mark, small.interval = big.interval) {
     # infinity, # not a number
+    stopifnot(big.mark %in% c("", "_"), small.mark %in% c("", "_"))
     s <- format(x, nsmall = 1L, digits = 22, scientific = FALSE,
-                big.mark = "_", small.mark = "_", small.interval = 3L)
+                big.mark = "_", big.interval = big.interval,
+                small.mark = "_", small.interval = small.interval)
     s <- ifelse(is.nan(x), "nan", s)
     s <- ifelse(is.infinite(x) & x > 0, "inf", s) #### +inf instead?
     s <- ifelse(is.infinite(x) & x < 0, "-inf", s)
@@ -139,24 +165,23 @@ encode_toml.numeric <- function(x, ...) {
 #' @rdname encode_toml
 #' @export
 encode_toml.Date <- function(x, ...) {
-    #### Format Dates directly...
     s <- format(x)
     maybe_as_array(s)
 }
 
-#' @rdname encode_toml
-#' @export
-encode_toml.POSIXt <- function(x, ...) {
-    s <- datetimeoffset::format_iso8601(datetimeoffset::as_datetimeoffset(x))
+encode_toml_datetime <- function(x, ...) {
+    x <- datetimeoffset::as_datetimeoffset(x)
+    s <- datetimeoffset::format_iso8601(x, mode = "toml")
     maybe_as_array(s)
 }
+
+#' @rdname encode_toml
+#' @export
+encode_toml.POSIXt <- encode_toml_datetime
 
 #' @rdname encode_toml
 #' @export
 encode_toml.datetimeoffset <- function(x, ...) {
-    s <- datetimeoffset::format_iso8601(datetimeoffset::as_datetimeoffset(x))
+    s <- datetimeoffset::format_iso8601(x, mode = "toml")
     maybe_as_array(s)
 }
-
-#### Other datetime classes that `as_datetimeoffset()` work on from `{clock}`, `{parttime}`, `{nanotime}`, ...
-#### But register them in `.onLoad()` hook

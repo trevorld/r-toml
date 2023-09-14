@@ -9,8 +9,7 @@ write_toml(x, con = stdout(), ...)
 \arguments{
 \item{x}{An R object with an \code{\link[=encode_toml]{encode_toml()}} method.}
 
-\item{con}{A connection object or a character string.
-Passed to \code{\link[base:writeLines]{base::writeLines()}}.}
+\item{con}{A connection object or a character string of the filename.}
 
 \item{...}{Passed to \code{\link[=encode_toml]{encode_toml()}}.}
 }

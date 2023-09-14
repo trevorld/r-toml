@@ -10,16 +10,25 @@
 * [Overview](#overview)
 * [Installation](#installation)
 * [Examples](#examples)
+* [Comparison with {RccpTOML}](#rccptoml)
+* [Comparison with {blogdown}](#blogdown)
 * [Related software](#links)
 
 ## <a name="overview">Overview</a>
 
-**Warning:** this package is a work-in-progress.  
-Currently it only **encodes** [TOML](https://toml.io/) files and only passes 89/99 of the tests in the [toml-test](https://github.com/toml-lang/toml-test) test suite.  Depending on your TOML needs you may consider instead [{RccpTOML}](https://github.com/eddelbuettel/rcpptoml) or [{blogdown}](https://pkgs.rstudio.com/blogdown/reference/read_toml.html).
+Currently this package only **encodes** R objects to [TOML](https://toml.io/) v1.0.  
+
+Depending on your TOML needs you may consider instead [{RccpTOML}](https://github.com/eddelbuettel/rcpptoml) or [{blogdown}](https://pkgs.rstudio.com/blogdown/reference/read_toml.html).
 
 `{toml}` provides the following functions to support encoding R objects to [TOML](https://toml.io/).
 
-* `encode_toml()` is an S3 generic that encodes R objects as TOML.
+* `encode_toml()` is an S3 generic that encodes R objects as TOML.  Feel free to write a TOML encoder for any object you like: this package provides encoders for following:
+  
+  + named and unnamed lists
+  + character, integer, logical, numeric (double) vectors 
+  + the 64-bit integer vectors from `{bit64}`
+  + dates, datetimes, and times from `{base}`, `{clock}`, `{datetimeoffset}`, `{nanotime}`, and `{parttime}`
+
 * `write_toml()` encodes an R object to TOML and then writes it to a connection.
 
 ## <a name="installation">Installation</a>
@@ -34,7 +43,7 @@ remotes::install_github("trevorld/r-toml")
 library("toml")
 l <- list(title = "TOML Example",
           owner = list(name = "Tom Preston-Werner",
-                       dob = as.POSIXct("1979-05-27 07:32:00", 
+                       dob = as.POSIXct("1979-05-27 07:32:00",
                                         tz = "America/Los_Angeles")),
           database = list(server = "192.168.1.1",
                           ports = c(8001L, 8001L, 8002L),
@@ -46,8 +55,33 @@ l <- list(title = "TOML Example",
                          hosts = c("alpha", "omega"))
           )
 cat(encode_toml(l), sep = "\n")
+
+if (requireNamespace("bit64", quietly = TRUE)) {
+  library("datetimeoffset")
+  l <- list(int_64bit = bit64::as.integer64("9223372036854775807"),
+            offset_datetime = as_datetimeoffset("2023-04-05T01:02:03-07:00"),
+            local_datetime = as_datetimeoffset("2023-04-05T01:02:03"),
+            local_date = as.Date("2023-04-05"),
+            local_time = as_datetimeoffset("T01:02:03"))
+  cat(encode_toml(l), sep = "\n")
+}
 ```
 
+
+## <a name="rccptoml">Comparison with {RccpTOML}</a>
+
+**Note**: Please feel free to [open a pull request to fix any {RccpTOML} mis-understandings or statements that are now out-of-date](https://github.com/trevorld/r-toml/edit/main/README.Rmd).
+
+* Currently [{RccpTOML}](https://github.com/eddelbuettel/rcpptoml) only **decodes** TOML files while this package only **encodes** TOML files.
+
+## <a name="blogdown">Comparison with {blogdown}</a>
+
+**Note**: Please feel free to [open a pull request to fix any {blogdown} mis-understandings or statements that are now out-of-date](https://github.com/trevorld/r-toml/edit/main/README.Rmd).
+
+* The `read_toml()` / `write_toml()` functions in [{blogdown}](https://pkgs.rstudio.com/blogdown/reference/read_toml.html) can **read**/**write** TOML documents either by using `{RccpTOML}` or alternatively by converting from/to [YAML](https://yaml.org/) using [{yaml}](https://cran.r-project.org/web/packages/yaml/index.html) and then using [Hugo](https://gohugo.io/) to convert from/to TOML whereas this package **writes** TOML documents directly in R.
+* TOML generated from by `{blogdown}` may be formatted more nicely than TOML generated from this package.
+* This package (as of `{blogdown}` v1.18) seems to do a better job of encoding to TOML `{bit64}`'s "integer64" class as well as several datetime classes from `{base}`, `{clock}`, `{datetimeoffset}`, `{nanotime}`, and `{parttime}`.
+* This package lets you write your own `encode_toml()` methods to support encoding additional R objects that `{blogdown}` may not support.
 
 ## <a name="links">Related software</a>
 

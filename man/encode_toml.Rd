@@ -21,11 +21,18 @@ encode_toml(x, ...)
 
 \method{encode_toml}{character}(x, ...)
 
-\method{encode_toml}{integer}(x, ...)
+\method{encode_toml}{integer}(x, ..., big.mark = "_", big.interval = 3L)
 
 \method{encode_toml}{logical}(x, ...)
 
-\method{encode_toml}{numeric}(x, ...)
+\method{encode_toml}{numeric}(
+  x,
+  ...,
+  big.mark = "_",
+  big.interval = 3L,
+  small.mark = big.mark,
+  small.interval = big.interval
+)
 
 \method{encode_toml}{Date}(x, ...)
 
@@ -38,9 +45,18 @@ encode_toml(x, ...)
 
 \item{...}{Currently ignored}
 
-\item{prefix}{Prefix for keys.  If \code{NULL} assume this is the top-level aka root table.}
+\item{prefix}{Prefix for keys.
+If \code{NULL} and \code{isFALSE(inline)} assume this is the top-level aka root table.}
 
 \item{inline}{Encode as a TOML "inline" table.}
+
+\item{big.mark, big.interval}{\code{big.mark} is used as a mark between every \code{big.interval} decimals
+(before the decimal point).
+TOML allows this to be either \code{"_"} or \code{""}.}
+
+\item{small.mark, small.interval}{\code{small.mark} is used as a mark between every \code{small.interval} decimals
+after the decimal point.
+TOML allows this to be either \code{"_"} or \code{""}.}
 }
 \value{
 A character vector

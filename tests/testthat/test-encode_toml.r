@@ -10,6 +10,21 @@ test_that("Integers work", {
                  "a = 1")
     expect_equal(encode_toml(list(a = 123456L)),
                  "a = 123_456")
+
+    skip_if_not_installed("bit64")
+    expect_equal(encode_toml(bit64::as.integer64("23")), "23")
+    expect_equal(encode_toml(bit64::as.integer64("1023")), "1_023")
+    expect_equal(encode_toml(bit64::as.integer64("-1023")), "-1_023")
+    expect_equal(encode_toml(bit64::as.integer64("-123")), "-123")
+    expect_equal(encode_toml(bit64::as.integer64("1023"), big.mark = ""), "1023")
+    max_integer64 <- "9223372036854775807"
+    expect_equal(encode_toml(bit64::as.integer64(max_integer64)),
+                             "9_223_372_036_854_775_807")
+    expect_error(encode_toml(bit64::NA_integer64_))
+    skip("{bit64} treats -9223372036854775808 as an NA value")
+    min_integer64 <- "-9223372036854775808"
+    expect_equal(encode_toml(bit64::as.integer64(min_integer64)),
+                             "-9_223_372_036_854_775_808")
 })
 
 test_that("Arrays work", {
@@ -28,6 +43,29 @@ test_that("Datetimes work", {
                  "a = 2020-04-04")
     expect_equal(encode_toml(list(a = as.Date("2020-04-04"))),
                  "a = 2020-04-04")
+
+    dob <- as.POSIXct("1979-05-27 07:32:00", tz = "America/Los_Angeles")
+    expect_equal(encode_toml(dob),
+                 "1979-05-27T07:32:00.000000-07:00")
+
+    skip_on_cran()
+    dob <- datetimeoffset::as_datetimeoffset(dob)
+
+    skip_if_not_installed("clock")
+    expect_equal(encode_toml(clock::as_sys_time(dob)),
+                 "1979-05-27T14:32:00.000000Z")
+    expect_equal(encode_toml(clock::as_zoned_time(dob)),
+                 "1979-05-27T07:32:00.000000-07:00")
+    expect_equal(encode_toml(clock::as_year_month_day(dob)),
+                 "1979-05-27T07:32:00.000000")
+
+    skip_if_not_installed("nanotime")
+    expect_equal(encode_toml(nanotime::as.nanotime(dob)),
+                 "1979-05-27T14:32:00.000000000Z")
+
+    skip_if_not_installed("parttime")
+    expect_equal(encode_toml(parttime::as.parttime(dob)),
+                 "1979-05-27T07:32:00.000000000-07:00")
 })
 
 test_that("Floats work", {
