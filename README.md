@@ -22,7 +22,7 @@ Depending on your TOML needs you may consider instead [{RccpTOML}](https://githu
 
 `{toml}` provides the following functions to support encoding R objects to [TOML](https://toml.io/).
 
-* `encode_toml()` is an S3 generic that encodes R objects as TOML.  Feel free to write a TOML encoder for any object you like: this package provides encoders for following:
+* `encode_toml()` is an S3 generic that encodes R objects as TOML.  Feel free to write a TOML encoder for any object you like---this package provides encoders for following:
   
   + named and unnamed lists
   + character, integer, logical, numeric (double) vectors 
@@ -92,7 +92,7 @@ if (requireNamespace("bit64", quietly = TRUE)) {
 ## offset_datetime = 2023-04-05T01:02:03-07:00
 ## local_datetime = 2023-04-05T01:02:03
 ## local_date = 2023-04-05
-## local_time = T01:02:03
+## local_time = 01:02:03
 ```
 
 
